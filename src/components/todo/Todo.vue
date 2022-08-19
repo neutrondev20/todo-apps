@@ -1,22 +1,15 @@
 <script setup lang="ts">
 
-    import { reactive, ref, onUpdated } from 'vue';
-    import {addTask, updateTask} from "./Todo";
+    import { ref } from 'vue';
+    import useStoreMissions from '../../store/store_missions';
     import Task from "../task/Task.vue";
     import Button from "../button/Button.vue";
-    // import { createTask } from ""
 
-    type Mission = {
-        id : number,
-        text : string,
-        condition : boolean,
-        show : boolean
-    }
+    const storeMission = useStoreMissions();
 
-    let missions    = reactive<Mission[]>([])
     const input     = ref<{value : string} | null>(null)
     const filter    = ref<string>("all")
-    const task_edit = ref<{
+    const taskEdit = ref<{
         index : number,
         text  : string,
         selectTaskForEdit : boolean
@@ -29,12 +22,16 @@
 
     const createTask = () : void => {
 
-        if (input.value !== null) {
+        if (input.value !== null && input.value.value.replace(/ /g, "") !== "") {
 
-                
-            addTask(input.value.value, missions);
+           storeMission.addMission({
+            id        : storeMission.missionItems.length,
+            text      : input.value.value as string,
+            condition : true,
+            show      : true
+           })
 
-            input.value.value = "";
+           input.value !== null ? input.value.value = "" : null;
 
         } else {
 
@@ -42,26 +39,22 @@
         }
     }
 
-    const editTask = () : void => {
+    const editTask = () : void => {        
 
-        updateTask(missions[task_edit.value.index], input.value?.value as string)
+        if (input.value !== null && input.value.value.replace(/ /g, "") !== "") {
 
-        task_edit.value.selectTaskForEdit = false;
+            storeMission.updateMission(taskEdit.value.index, {...storeMission.missionItems[taskEdit.value.index], text : input.value.value})
 
-        input.value !== null ? input.value.value = "" : null;
+            taskEdit.value.selectTaskForEdit = false;
+
+            input.value !== null ? input.value.value = "" : null;
+
+        } else {
+
+            console.log("yaah, data kosong");
+        }
     }
 
-    onUpdated(() => {
-
-        localStorage.setItem("missions", JSON.stringify(missions));
-    })
-
-    const task = localStorage.getItem("missions") !== null ? JSON.parse(localStorage.getItem("missions") as string) : []
-
-    task.forEach((mission : Mission) => {
-        
-        missions.push(mission);
-    });
 </script>
 
 <template>
@@ -84,7 +77,7 @@
 
             <div class="w-full flex flex-row">
                 <input 
-                    @keypress.enter="task_edit.selectTaskForEdit === false ? createTask() : editTask()" 
+                    @keypress.enter="taskEdit.selectTaskForEdit === false ? createTask() : editTask()" 
                     ref="input"
                     type="text" 
                     placeholder="Add a new task"
@@ -95,25 +88,25 @@
                     @click="createTask()" 
                     value="Add" 
                     addClass="basis-1/4 bg-slate-900 text-gray-400 hover:text-gray-400"
-                    v-show="task_edit.selectTaskForEdit === false" 
+                    v-show="taskEdit.selectTaskForEdit === false" 
                 />
                 <Button 
-                    @click="editTask" 
+                    @click="editTask()" 
                     value="Edit" 
                     addClass="basis-1/4 bg-slate-900 text-gray-400 hover:text-gray-400"
-                    v-show="task_edit.selectTaskForEdit === true" 
+                    v-show="taskEdit.selectTaskForEdit === true" 
                 />
             </div>
             <div class="h-full mt-4">
                 <Task 
-                    v-for="(mission , index) in missions" 
+                    v-for="(mission , index) in storeMission.missionItems"
+                    v-show="filter === 'all' ? true : (filter === 'done' ? !mission.condition : mission.condition)"
                     :key="mission.id" 
                     :input="(mission.text)"
-                    :conditions="[{'line-through': !mission.condition} , {'border-green-500': !mission.condition}]" 
-                    @showFunc="missions.splice(index , 1)" 
-                    @changeCondition="mission.condition = !mission.condition"
-                    @edit="task_edit.index = mission.id , task_edit.selectTaskForEdit = true , (input !== null ? input.value = mission.text : null)"
-                    v-show="filter === 'all' ? true : (filter === 'done' ? !mission.condition : mission.condition)"
+                    :conditions="[{'line-through': !mission.condition} , {'border-green-500': !mission.condition}]"
+                    @changeCondition="storeMission.updateMission(index, {...mission, condition : !mission.condition})"
+                    @delete="storeMission.deleteMission(index)" 
+                    @edit="taskEdit.index = mission.id , taskEdit.selectTaskForEdit = true , (input !== null ? input.value = mission.text : null)"
                 />
             </div>
         </div>
@@ -121,5 +114,15 @@
 </template>
 
 <style scoped>
+.all{
+    @apply after:left-0 after:w-[3.25rem] sm:after:w-14
+}
 
+.done{
+    @apply after:w-[4.25rem] sm:after:w-20 after:left-[50px] sm:after:left-[55px]
+}
+
+.undone{
+    @apply after:w-[5.45rem] sm:after:w-[6.25rem] after:left-[119px] sm:after:left-[133px]
+}
 </style>

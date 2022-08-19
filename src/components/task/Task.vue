@@ -25,7 +25,7 @@
                 {{input}}
             </p>
             <div>
-                <i @click="$emit('showFunc')" class="fa-solid fa-trash-can text-red-500 mr-4 cursor-pointer"></i>
+                <i @click="$emit('delete')" class="fa-solid fa-trash-can text-red-500 mr-4 cursor-pointer"></i>
                 <i @click="$emit('edit')" class="fa-solid fa-pen-to-square text-green-500 cursor-pointer"></i>
             </div>
         </div>
