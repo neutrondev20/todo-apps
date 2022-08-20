@@ -10,6 +10,7 @@ specifiers:
   autoprefixer: ^10.4.8
   brandi: ^4.0.2
   daisyui: ^2.24.0
+  dexie: ^3.2.2
   js-cookie: ^3.0.1
   pinia: ^2.0.19
   postcss: ^8.4.16
@@ -29,6 +30,7 @@ dependencies:
   '@fortawesome/vue-fontawesome': 2.0.8_sqiqa7hvpgqdakjrbqzbqxvzme
   brandi: 4.0.2
   daisyui: 2.24.0_25hquoklqeoqwmt7fwvvcyxm5e
+  dexie: 3.2.2
   js-cookie: 3.0.1
   pinia: 2.0.19_j6bzmzd4ujpabbp5objtwxyjp4
   view-router: 0.2.3
@@ -488,6 +490,11 @@ packages:
       acorn-node: 1.8.2
       defined: 1.0.0
       minimist: 1.2.6
+
+  /dexie/3.2.2:
+    resolution: {integrity: sha512-q5dC3HPmir2DERlX+toCBbHQXW5MsyrFqPFcovkH9N2S/UW/H3H5AWAB6iEOExeraAu+j+zRDG+zg/D7YhH0qg==}
+    engines: {node: '>=6.0'}
+    dev: false
 
   /didyoumean/1.2.2:
     resolution: {integrity: sha512-gxtyfqMg7GKyhQmb056K7M3xszy/myH8w+B4RT+QXBQsvAOdc3XymqDDPHx1BgPgsdAA5SIifona89YtRATDzw==}

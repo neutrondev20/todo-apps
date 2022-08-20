@@ -21,16 +21,19 @@ export class RemoteMission implements ARemoteMission<IRequestMission> {
 
         const { data, error } = await this.client.get(url);
 
-        // if (error?.response?.status === 401) {
-            // TODO unauthorized handler
-            // throw new UnauthorizedException
-        //     console.log(error);
-        // }
+    
+        if (error) {
 
-        if (error)
             console.log(error);
-            
 
+            return {
+                status : "ERROR",
+                message : "Internal server error",
+                data : []
+            }
+            
+        }
+            
         return data;
     }
 
@@ -48,8 +51,17 @@ export class RemoteMission implements ARemoteMission<IRequestMission> {
 
         const { data, error } = await this.client.delete(`${url}/${index}`);
 
-        if (error)
+        if (error) {
+
             console.log(error);
+
+            return {
+                status : "ERROR",
+                message : "Internal server error",
+                data : []
+            }
+            
+        }
 
         return data;
     }

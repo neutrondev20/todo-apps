@@ -1,6 +1,7 @@
 import { injected, token } from "brandi";
 import { IMission, IRequestMission } from "../interface/interface_missions";
 import { ARemoteMission, TOKENS as RemoteTokens } from "../data/remote/remote_mission";
+import { ALocalMIssion, TOKENS as LocalTokens } from "../data/local/local_missions";
 
 export abstract class ARepositoryMissions<T> {
 
@@ -14,18 +15,36 @@ export abstract class ARepositoryMissions<T> {
 export class RepositoryMissions implements ARepositoryMissions<IRequestMission> {
 
     remote : ARemoteMission<IRequestMission>
+    local  : ALocalMIssion<IMission>
 
-    constructor(remote : ARemoteMission<IRequestMission>){
+    constructor(remote : ARemoteMission<IRequestMission>, local : ALocalMIssion<IMission>){
 
         this.remote = remote;
+        this.local = local;
     }
 
     async get(): Promise<IRequestMission> {
-        
-        return await this.remote.get();
+
+        try {
+
+        } catch {
+            
+        }
+        const response = await this.remote.get();
+
+        if (response.status === "ERROR")
+            return {
+                ...response,
+                data : await this.local.get()
+            }
+        else
+            return response
+         
     }
 
     async create(item : IMission) : Promise<IRequestMission>{
+
+        await this.local.create(item)
 
         return await this.remote.create(item);
     }
@@ -46,5 +65,5 @@ export const TOKENS = {
     repositoryMission : token<ARemoteMission<IRequestMission>>("Repository Mission")
 }
 
-injected(RepositoryMissions, RemoteTokens.remoteMission)
+injected(RepositoryMissions, RemoteTokens.remoteMission, LocalTokens.localMission)
 

@@ -3,16 +3,16 @@ import { IMission, IRequestMission } from "../../interface/interface_missions";
 import { ARepositoryMissions, TOKENS as RepositoryTokens } from "../../repository/repository_missions";
 import { TMission } from './../../types/mission_type';
 
-abstract class AModelMission<T> {
+export abstract class AModelMission<T> {
 
     abstract get() : Promise<T[]>
 
-    abstract create(item : TMission) : Promise<T>
+    abstract create(item : TMission) : Promise<void>
 
-    abstract delete(index : string | number) : Promise<T>
+    abstract delete(index : string | number) : Promise<void>
 }
 
-export class ModelMission {
+export class ModelMission implements AModelMission<TMission> {
     
     repository : ARepositoryMissions<IRequestMission>
     
@@ -39,7 +39,7 @@ export class ModelMission {
         await this.repository.create(data)
     }
 
-    async delete(index : string | number) : Promise<void> {
+    async delete(index : string | number) :Promise<void> {
 
         await this.repository.delete(index);
     }
@@ -48,7 +48,7 @@ export class ModelMission {
 
 export const TOKENS = {
     
-    modelsMission : token<AModelMission<IMission>>("Model mission")
+    modelsMission : token<AModelMission<TMission>>("Model mission")
 }
 
 injected(ModelMission, RepositoryTokens.repositoryMission);
