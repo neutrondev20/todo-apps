@@ -36,7 +36,6 @@ export class RequestBuilder<BodyInterface = any> {
     _request  : Request<BodyInterface> | null = null
     _response : Response | null = null
 
-
     _getBaseHeaders(): object {
         const baseHeaders = {
             "Content-Type": "application/json",
@@ -112,7 +111,7 @@ export class RequestBuilder<BodyInterface = any> {
     }
 
     async send(): Promise<Response> {
-
+        
         this.initializeResponse();
 
         if (this._token !== null) {
@@ -121,17 +120,18 @@ export class RequestBuilder<BodyInterface = any> {
         }
 
         try {
+            
             const response = await fetch(
-                new URL(this._request!.url),
+                this._request!.url,
                 {
                     method: this._request!.method,
                     body: this._request!.body === null ? null : JSON.stringify(this._request!.body),
                     headers: new Headers({ ...this._request!.headers }),
-                    credentials: "include",
+                    // credentials: "include",
                     signal: this._response!.abort.signal,
                 }
             )
-
+            
             if (!response.ok) {
 
                 if (response.status === 401 || response.status === 419) {

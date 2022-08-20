@@ -6,3 +6,9 @@ export interface IMission {
     createAt  : Date,
     updateAt  : Date
 }
+
+export interface IRequestMission {
+    status  : string,
+    message : string,
+    data    : IMission[] | null
+}

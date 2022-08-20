@@ -1,26 +1,55 @@
 import { token } from 'brandi';
-import { IMission } from './../../interface/interface_missions';
+import { IRequestMission } from './../../interface/interface_missions';
 import { RequestBuilder } from '../../utils/use_fetch';
 
+const url = "http://localhost:5001/missions"
 
-export abstract class IRemoteMission<T> {
-    abstract get() : Promise<T[]>
+export abstract class ARemoteMission<T> {
+
+    abstract get() : Promise<T>
+
+    abstract create(item : any) : Promise<T>
+
+    abstract delete(index : string | number) : Promise<T>
 }
 
-export class RemoteMission implements IRemoteMission<IMission> {
+export class RemoteMission implements ARemoteMission<IRequestMission> {
 
-    client: RequestBuilder = new RequestBuilder;
+    client: RequestBuilder = new RequestBuilder();
 
-    async get() : Promise<IMission[]> {
+    async get() : Promise<IRequestMission> {
 
-        const url = "http://localhost:5001/missions"
+        const { data, error } = await this.client.get(url);
 
-        const { data, error } = await this.client.get(url)
-
-        if (error?.response?.status === 401) {
+        // if (error?.response?.status === 401) {
             // TODO unauthorized handler
             // throw new UnauthorizedException
-        }
+        //     console.log(error);
+        // }
+
+        if (error)
+            console.log(error);
+            
+
+        return data;
+    }
+
+    async create(item : IRequestMission) {
+        
+        const { data, error } = await this.client.post(url, item);
+
+        if (error)
+            console.log(error);
+
+        return data;
+    }
+
+    async delete(index : string | number) {
+
+        const { data, error } = await this.client.delete(`${url}/${index}`);
+
+        if (error)
+            console.log(error);
 
         return data;
     }
@@ -28,5 +57,5 @@ export class RemoteMission implements IRemoteMission<IMission> {
 
 export const TOKENS = {
 
-    remoteMission : token<IRemoteMission<IMission>>("Remote Mission")
+    remoteMission : token<ARemoteMission<IRequestMission>>("Remote Mission")
 }

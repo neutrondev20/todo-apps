@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-    import { ref } from 'vue';
+    import { ref, onMounted } from 'vue';
     import useStoreMissions from '../../store/store_missions';
     import Task from "../task/Task.vue";
     import Button from "../button/Button.vue";
@@ -20,11 +20,16 @@
     }) 
      
 
-    const createTask = () : void => {
+     onMounted( async () => {
+
+        await storeMission.initialize();
+     })
+
+    const createTask = async () : Promise<void> => {
 
         if (input.value !== null && input.value.value.replace(/ /g, "") !== "") {
 
-           storeMission.addMission({
+           await storeMission.addMission({
             id        : storeMission.missionItems.length,
             text      : input.value.value as string,
             condition : true,

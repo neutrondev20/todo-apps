@@ -1,33 +1,49 @@
 import { defineStore } from "pinia";
-import { Mission } from "../types/mission_type";
+import {TOKENS as ModelTokens} from "../domain/models/models_missions";
+import { TMission } from "../types/mission_type";
+import {container} from "../utils/di";
+
+const model = container.get(ModelTokens.modelsMission);
 
 const useStoreMissions = defineStore("store-missions", {
     state : () => ({
-        missionItems : [] as Mission[]
+        missionItems : [] as TMission[],
+        isLoading : false,
     }),
     actions : {
-        initialize() {
-            // TODO
-            // Get data from repository
-            this.missionItems = []
+        async initialize() {
+            try {
+
+            this.isLoading = true;
+            
+            const data = await model.get();
+            
+            this.missionItems = data;
+
+            } finally {
+
+                this.isLoading = false;
+            }
         },
-        addMission(mission : Mission) {
+        async addMission(mission : TMission) {
 
             this.missionItems.push(mission);
-        },
-        updateMission(index : number, mission : Mission) {
 
-            this.missionItems[index] = {
-                ...mission
-            };
+            await model.create(mission)
+        },
+        updateMission(index : number, mission : TMission) {
+
+            this.missionItems[index] = {...mission};
         },
         deleteMission(index : number) {
 
             this.missionItems.splice(index, 1)
+
+            model.delete(index)
         }
     },
     getters : {
-        get() : Mission[]  {
+        get() : TMission[]  {
 
             return this.missionItems
         }
