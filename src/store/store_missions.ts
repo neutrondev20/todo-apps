@@ -17,7 +17,7 @@ const useStoreMissions = defineStore("store-missions", {
         },
         updateMission(index : number, mission : Mission) {
 
-            this.missionItems[index]  = {
+            this.missionItems[index] = {
                 ...mission
             };
         },

@@ -1,14 +1,6 @@
+import { IMission } from "../../interface/interface_missions";
 
-export interface ModelsMission {
-    id        : number,
-    text      : string,
-    condition : boolean,
-    show      : boolean,
-    createAt  : Date,
-    updateAt  : Date
-}
-
-export class Mission implements ModelsMission {
+export class Mission implements IMission {
     
     id        : number
     text      : string
@@ -17,7 +9,7 @@ export class Mission implements ModelsMission {
     createAt  : Date
     updateAt  : Date
 
-    constructor(item : ModelsMission) {
+    constructor(item : IMission) {
         this.id        = item.id
         this.text      = item.text
         this.condition = item.condition
@@ -26,4 +18,5 @@ export class Mission implements ModelsMission {
         this.updateAt  = item.updateAt
     }
 
+    
 }
