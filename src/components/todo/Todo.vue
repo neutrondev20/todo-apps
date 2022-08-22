@@ -110,7 +110,7 @@
                     :input="(mission.text)"
                     :conditions="[{'line-through': !mission.condition} , {'border-green-500': !mission.condition}]"
                     @changeCondition="storeMission.updateMission(index, {...mission, condition : !mission.condition})"
-                    @delete="storeMission.deleteMission(index)" 
+                    @delete="storeMission.deleteMission(mission.id)" 
                     @edit="taskEdit.index = mission.id , taskEdit.selectTaskForEdit = true , (input !== null ? input.value = mission.text : null)"
                 />
             </div>

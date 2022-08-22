@@ -47,7 +47,7 @@ export class RemoteMission implements ARemoteMission<IRequestMission> {
         return data;
     }
 
-    async delete(index : string | number) {
+    async delete(index : string | number) : Promise<IRequestMission> {
 
         const { data, error } = await this.client.delete(`${url}/${index}`);
 

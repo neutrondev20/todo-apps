@@ -25,11 +25,6 @@ export class RepositoryMissions implements ARepositoryMissions<IRequestMission> 
 
     async get(): Promise<IRequestMission> {
 
-        try {
-
-        } catch {
-            
-        }
         const response = await this.remote.get();
 
         if (response.status === "ERROR")
@@ -54,9 +49,12 @@ export class RepositoryMissions implements ARepositoryMissions<IRequestMission> 
 
     }
 
-    async delete(index : string | number){
+    async delete(index : string | number) : Promise<IRequestMission>{
+
+        await this.local.del(index)
 
         return await this.remote.delete(index)
+        
     }
 }
 
