@@ -14,13 +14,15 @@ export abstract class ALocalMIssion<T> extends Dexie {
 export class LocalMission extends Dexie implements ALocalMIssion<IMission> {
 
     mission! : Table<IMission>
+    request! : Table<any>
 
     constructor(){
 
         super("localDB");
 
         this.version(1).stores({
-            mission : 'id, text, condition, show, createAt, updateAt'
+            mission : '++id, text, condition, show, createAt, updateAt',
+            request : '++id, body, method, url'
         })
     }
 
@@ -29,9 +31,15 @@ export class LocalMission extends Dexie implements ALocalMIssion<IMission> {
         return (await this.mission.toArray()) || []
     }
 
-    async create(item : IMission) : Promise<void> {
+    async create(item : IMission) : Promise<void> {         
 
-        this.mission.add(item);
+        if (Array.isArray(item)) {
+
+            this.mission.bulkAdd(item)
+        } else {
+
+            this.mission.add(item);
+        }
     }
 
     async del(index : string | number) : Promise<void> {

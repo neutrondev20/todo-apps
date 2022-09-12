@@ -115,6 +115,11 @@
                 />
             </div>
         </div>
+        <div class="text-center">
+            <button @click="storeMission.initialize()" class="btn bg-white border borde-gray-300  px-6 py-2 rounded-lg">
+                Refresh
+            </button>
+        </div>
     </div>
 </template>
 

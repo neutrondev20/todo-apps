@@ -1,8 +1,9 @@
+import { backgroundSync } from './../../utils/background_sync';
 import { token } from 'brandi';
 import { IRequestMission } from './../../interface/interface_missions';
 import { RequestBuilder } from '../../utils/use_fetch';
 
-const url = "http://localhost:5001/missions"
+const url = "https://192.168.0.109:5001/missions"
 
 export abstract class ARemoteMission<T> {
 
@@ -20,7 +21,6 @@ export class RemoteMission implements ARemoteMission<IRequestMission> {
     async get() : Promise<IRequestMission> {
 
         const { data, error } = await this.client.get(url);
-
     
         if (error) {
 
@@ -41,8 +41,23 @@ export class RemoteMission implements ARemoteMission<IRequestMission> {
         
         const { data, error } = await this.client.post(url, item);
 
-        if (error)
+        if (error) {
+
             console.log(error);
+
+            await backgroundSync({
+                url,
+                method : "POST",
+                body : item
+            })
+
+            return {
+                status : "ERROR",
+                message : "Internal server error",
+                data : []
+            }
+            
+        }
 
         return data;
     }
@@ -55,14 +70,18 @@ export class RemoteMission implements ARemoteMission<IRequestMission> {
 
             console.log(error);
 
+            await backgroundSync({
+                url : `${url}/${index}`,
+                method : "DELETE",
+                body : {}
+            })
+
             return {
                 status : "ERROR",
                 message : "Internal server error",
                 data : []
-            }
-            
+            }   
         }
-
         return data;
     }
 }

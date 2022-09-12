@@ -35,11 +35,15 @@ const useStoreMissions = defineStore("store-missions", {
 
             this.missionItems[index] = {...mission};
         },
-        deleteMission(index : number) {
+        deleteMission(id : number) {
 
-            this.missionItems.splice(index, 1)
+            const index = this.missionItems.findIndex(mission => mission.id === id) 
 
-            model.delete(index)
+            delete this.missionItems[index]
+
+            this.missionItems = this.missionItems.filter(i => i);
+
+            model.delete(id)
         }
     },
     getters : {

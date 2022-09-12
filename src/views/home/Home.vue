@@ -1,11 +1,11 @@
 <script setup lang="ts">
     import Todo from '../../components/todo/Todo.vue';
-    import ReloadPWA from '../../components/pwa/ReloadPWA.vue';
 </script>
 
 <template>
-    <ReloadPWA />
-    <Todo />
+    <div>
+         <Todo />
+    </div>
 </template>
 
 <style scoped>

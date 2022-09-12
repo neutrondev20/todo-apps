@@ -127,7 +127,6 @@ export class RequestBuilder<BodyInterface = any> {
                     method: this._request!.method,
                     body: this._request!.body === null ? null : JSON.stringify(this._request!.body),
                     headers: new Headers({ ...this._request!.headers }),
-                    // credentials: "include",
                     signal: this._response!.abort.signal,
                 }
             )

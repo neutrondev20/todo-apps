@@ -20,7 +20,7 @@ export class RepositoryMissions implements ARepositoryMissions<IRequestMission> 
     constructor(remote : ARemoteMission<IRequestMission>, local : ALocalMIssion<IMission>){
 
         this.remote = remote;
-        this.local = local;
+        this.local  = local;
     }
 
     async get(): Promise<IRequestMission> {
@@ -28,10 +28,7 @@ export class RepositoryMissions implements ARepositoryMissions<IRequestMission> 
         const response = await this.remote.get();
 
         if (response.status === "ERROR")
-            return {
-                ...response,
-                data : await this.local.get()
-            }
+            return { ...response, data : await this.local.get()}
         else
             return response
          
@@ -39,29 +36,21 @@ export class RepositoryMissions implements ARepositoryMissions<IRequestMission> 
 
     async create(item : IMission) : Promise<IRequestMission>{
 
-        await this.local.create(item)
+        const response = await this.remote.create(item);
 
-        return await this.remote.create(item);
-    }
-
-    async update(){
-
-
+        return response
     }
 
     async delete(index : string | number) : Promise<IRequestMission>{
 
-        await this.local.del(index)
+        await this.local.del(index);
 
-        return await this.remote.delete(index)
+        return await this.remote.delete(index);
         
     }
 }
 
-export const TOKENS = {
-
-    repositoryMission : token<ARemoteMission<IRequestMission>>("Repository Mission")
-}
+export const TOKENS = { repositoryMission : token<ARemoteMission<IRequestMission>>("Repository Mission")}
 
 injected(RepositoryMissions, RemoteTokens.remoteMission, LocalTokens.localMission)
 
