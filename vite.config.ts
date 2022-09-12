@@ -8,15 +8,15 @@ console.log(process.env.SW_DEV)
 
 // https://vitejs.dev/config/
 export default defineConfig({
-    server : {
-        https : {
-            key : fs.readFileSync("./server.key"),
-            cert : fs.readFileSync("./server.crt")
-        }
-    },
+    // server : {
+    //     https : {
+    //         key  : fs.readFileSync("./server.key"),
+    //         cert : fs.readFileSync("./server.crt")
+    //     }
+    // },
     plugins: [vue(), VitePWA({
         registerType: "autoUpdate",
-        mode : "development",
+        // mode : "development",
         strategies: "injectManifest",
         base : "./",
         srcDir: 'src',
@@ -49,7 +49,7 @@ export default defineConfig({
             ],
         },
         devOptions : {
-            enabled: true,
+            enabled: false,
             type: 'module',
             navigateFallback: 'index.html'
         }, 
