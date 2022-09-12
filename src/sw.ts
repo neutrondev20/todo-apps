@@ -6,9 +6,13 @@ declare let self: ServiceWorkerGlobalScope;
 // self.__WB_MANIFEST is default injection point
 precacheAndRoute(self.__WB_MANIFEST)
 
-const cacheName      = 'js13kPWA-v1';
-const contentToCache = [ "index.html"]
-const denyList       = ["/missions"]
+// the cache version gets updated every time there is a new deployment
+const CACHE_VERSION = 1;
+const CURRENT_CACHE = `main-${CACHE_VERSION}`;
+const DENIED_LIST   = ["/missions"]
+
+// these are the routes we are going to cache for offline support
+// const cacheFiles = ['/index.html'];
 
 async function fetchMission(request : {url : string, method : string, body : any}, checkServer : boolean = true) : Promise<Response>{
 
@@ -58,59 +62,86 @@ async function fetchMission(request : {url : string, method : string, body : any
     return response as Response;
 }
 
+// cache the current page to make it available for offline
+async function update(request : Request, response : Response) : Promise<void> {
+
+    console.log("[Service worker] Update cache");
+
+    const cache = await caches.open(CURRENT_CACHE)
+
+    cache.put(request, response.clone());
+}
+
+// fetch the resource from the network
+function fromNetwork(request : Request, timeout : number) {
+
+    return new Promise( async (resolve, reject) => {
+        try {
+
+            const timeoutId = setTimeout(reject, timeout);
+
+            const response = await fetch(request);
+
+            clearTimeout(timeoutId);
+
+            await update(request, response);
+
+            console.log("[Service worker] From network");
+
+            resolve(response);  
+
+        } catch {
+
+            reject();
+        }
+    })
+}
+
+// fetch the resource from the browser cache
+async function fromCache(request : Request) {
+
+    console.log("[Service worker] From cache");
+
+    return await caches.match(request);
+}
+
+// on activation we clean up the previously registered service workers
+self.addEventListener("activate", (event) => {
+
+    console.log('[Service Worker] Active');
+
+    self.skipWaiting();
+
+    // event.waitUntil(
+    //     caches.keys().then(cacheNames => {
+    //         return Promise.all(
+    //             cacheNames.map(cacheName => {
+    //                 if (cacheName !== CURRENT_CACHE) { return caches.delete(cacheName) }
+    //             })
+    //         )
+    //     })
+    // )
+})
+
+// on install we download the routes we want to cache for offline
 self.addEventListener("install", (event) => {
     
     console.log('[Service Worker] Install');
 
-    self.skipWaiting();
-
-    // event.waitUntil((async () => {
-        
-    //     const cache = await caches.open(cacheName);
-
-    //     console.log('[Service Worker] Caching all: app shell and content');
-
-    //     await cache.addAll(contentToCache);
-
-    // })());
+    self.skipWaiting();   
 })
 
-self.addEventListener("fetch", async event => {
+self.addEventListener("fetch", async (event) => {
 
     const url = new URL(event.request.url);
 
-    if (denyList.includes(url.pathname) || event.request.method !== "GET")
-        return console.log(url.pathname, " Denied");
+    if (DENIED_LIST.includes(url.pathname) || event.request.method !== "GET")
+        return console.log(event.request.method, url.pathname,  " Denied");
 
-    console.log(`[Service Worker] Fetched resource ${url}`);
-
-    event.respondWith((async () => {
-        
-        const r = await caches.match(event.request);
-        
-        console.log(`[Service Worker] Fetching resource: ${url}`);
-
-        if (r) {
-
-            console.log(`[Service Worker] From cache: ${url}`);
-
-            return r;
-        } 
-
-        const response = await fetch(event.request);
-
-        const cache    = await caches.open(cacheName);
-
-        console.log(`[Service Worker] Caching new resource: ${url}`);
-
-        cache.put(event.request, response.clone());
-
-        return response;
-
-    })())
+    event.respondWith(fromNetwork(event.request, 10000).catch(() => fromCache(event.request)) as Promise<Response>)
 })  
 
-self.addEventListener('sync', (event : Event) => {
+self.addEventListener('sync', (event) => {
 
     const local = new LocalMission();
 

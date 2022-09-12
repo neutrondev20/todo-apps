@@ -19,6 +19,9 @@ export const backgroundSync = async (request : {url : string, method : string, b
         body   : request.body,
     })
 
+    console.log("Sync registered background-missions");
+    
+
     // @ts-ignore
     await registration.sync.register('background-missions');
 }
